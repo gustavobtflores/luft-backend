@@ -1,0 +1,21 @@
+{
+  "name": "luft-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "yarn build && node dist/src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "gustavobtflores",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/module-alias": "^2.0.4",
+    "@types/node": "^20.11.25",
+    "typescript": "^5.4.2"
+  },
+  "dependencies": {
+    "module-alias": "^2.2.3"
+  }
+}
