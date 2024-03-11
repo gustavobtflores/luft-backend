@@ -1,0 +1,18 @@
+[
+  {
+    "regularMarketChange": 0.21000004,
+    "regularMarketChangePercent": 2.6119406,
+    "regularMarketTime": "2024-02-09T21:11:00.000Z",
+    "regularMarketPrice": 8.25,
+    "symbol": "ROXO34",
+    "logourl": "https://s3-symbol-logo.tradingview.com/nu-holdings--big.svg"
+  },
+  {
+    "regularMarketChange": 0.5699997,
+    "regularMarketChangePercent": 2.080291,
+    "regularMarketTime": "2024-02-09T21:11:00.000Z",
+    "regularMarketPrice": 27.97,
+    "symbol": "INBR32",
+    "logourl": "https://s3-symbol-logo.tradingview.com/inter-and-co--big.svg"
+  }
+]

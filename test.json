@@ -1,0 +1,31 @@
+{
+  "accounts": [
+    {
+      "name": "Binance",
+      "type": "crypto",
+      "balance": 512.65,
+      "balance_history": [
+        {
+          "total": 512.65,
+          "profitability": 502,
+          "profitability_percentual": 27.05
+        }
+      ]
+    }
+  ],
+  "assets": [
+    {
+      "avgPrice": 5.7,
+      "quantity": 10,
+      "symbol": "ROXO34",
+      "regularMarketPrice": 9.92,
+      "regularMarketChange": 1.53,
+      "regularMarketChangePercent": 2.13,
+      "logourl": ""
+    }
+  ],
+  "total_balance": 2530.9,
+  "balance_history": [
+    { "total": 2607, "profitability": 502, "profitability_percentual": 27.05 }
+  ]
+}
