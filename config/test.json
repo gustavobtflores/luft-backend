@@ -1,0 +1,9 @@
+{
+  "App": {
+    "resources": {
+      "Brapi": {
+        "apiToken": "test-token"
+      }
+    }
+  }
+}

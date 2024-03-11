@@ -1,5 +1,6 @@
 import { InternalError } from '@src/utils/errors/internal-error';
 import { AxiosError, AxiosStatic } from 'axios';
+import config, { IConfig } from 'config';
 
 export interface BrapiQuote {
   readonly currency: string;
@@ -63,8 +64,10 @@ export class BrapiRequestError extends InternalError {
   }
 }
 
+const brapiResourceConfig: IConfig = config.get('App.resources.Brapi');
+
 export class Brapi {
-  private baseURL = 'https://brapi.dev/api';
+  private baseURL = brapiResourceConfig.get<string>('apiUrl');
   private requestTickersAmountLimit = 10;
 
   constructor(protected http: AxiosStatic) {}
@@ -75,7 +78,9 @@ export class Brapi {
         `/quote/${tickers}`,
         {
           baseURL: this.baseURL,
-          headers: { Authorization: `Bearer ${process.env.BRAPI_TOKEN}` },
+          headers: {
+            Authorization: `Bearer ${brapiResourceConfig.get('apiToken')}`,
+          },
         }
       );
 

@@ -1,0 +1,10 @@
+{
+  "App": {
+    "resources": {
+      "Brapi": {
+        "apiUrl": "https://brapi.dev/api",
+        "apiToken": "TBD"
+      }
+    }
+  }
+}
