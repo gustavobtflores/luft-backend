@@ -1,20 +1,26 @@
 import { Brapi } from '@src/clients/brapi';
-import axios from 'axios';
 
 import brapiQuotesFixture from '@test/fixtures/brapi_quotes.json';
 import brapiQuotesNormalizedFixture from '@test/fixtures/brapi_quotes_normalized.json';
 
-jest.mock('axios');
+import * as HTTPUtil from '@src/utils/request';
+
+jest.mock('@src/utils/request');
 
 describe('Brapi client', () => {
-  const mockedAxios = axios as jest.Mocked<typeof axios>;
+  const MockedRequestClass = HTTPUtil.Request as jest.Mocked<
+    typeof HTTPUtil.Request
+  >;
+  const mockedRequest = new HTTPUtil.Request() as jest.Mocked<HTTPUtil.Request>;
 
   it('should return the normalized assets quotation from the Brapi service', async () => {
     const tickers = ['ROXO34', 'INBR32'];
 
-    mockedAxios.get.mockResolvedValue({ data: brapiQuotesFixture });
+    mockedRequest.get.mockResolvedValue({
+      data: brapiQuotesFixture,
+    } as HTTPUtil.Response);
 
-    const brapi = new Brapi(axios);
+    const brapi = new Brapi(mockedRequest);
     const response = await brapi.fetchQuotes(tickers);
     expect(response).toEqual(brapiQuotesNormalizedFixture);
   });
@@ -30,18 +36,20 @@ describe('Brapi client', () => {
       ],
     };
 
-    mockedAxios.get.mockResolvedValue({ data: incompleteResponse });
+    mockedRequest.get.mockResolvedValue({
+      data: incompleteResponse,
+    } as HTTPUtil.Response);
 
-    const brapi = new Brapi(axios);
+    const brapi = new Brapi(mockedRequest);
     const response = await brapi.fetchQuotes(tickers);
     expect(response).toEqual([]);
   });
 
   it('should get a generic error from Brapi client when the request fail before reaching the service', async () => {
     const tickers = ['ROXO34', 'INBR32'];
-    mockedAxios.get.mockRejectedValue({ message: 'Network Error' });
+    mockedRequest.get.mockRejectedValue({ message: 'Network Error' });
 
-    const brapi = new Brapi(axios);
+    const brapi = new Brapi(mockedRequest);
 
     await expect(brapi.fetchQuotes(tickers)).rejects.toThrow(
       'Unexpected error when trying to communicate to Brapi: Network Error'
@@ -51,7 +59,8 @@ describe('Brapi client', () => {
   it('should get an BrapiResponseError when the Brapi service responds with error', async () => {
     const tickers = ['ROXO34', 'INBR32'];
 
-    mockedAxios.get.mockRejectedValue({
+    MockedRequestClass.isRequestError.mockReturnValue(true);
+    mockedRequest.get.mockRejectedValue({
       response: {
         status: 402,
         data: {
@@ -62,7 +71,7 @@ describe('Brapi client', () => {
       },
     });
 
-    const brapi = new Brapi(axios);
+    const brapi = new Brapi(mockedRequest);
 
     await expect(brapi.fetchQuotes(tickers)).rejects.toThrow(
       'Unexpected error returned by Brapi service: Error: {"error":true,"message":"Você atingiu o limite de requisições para o seu plano. Por favor, considere fazer um upgrade para um plano melhor em brapi.dev/dashboard"} Code: 402'

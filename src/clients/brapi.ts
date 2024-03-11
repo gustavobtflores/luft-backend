@@ -1,6 +1,7 @@
 import { InternalError } from '@src/utils/errors/internal-error';
-import { AxiosError, AxiosStatic } from 'axios';
 import config, { IConfig } from 'config';
+import * as HTTPUtil from '@src/utils/request';
+import { AxiosError } from 'axios';
 
 export interface BrapiQuote {
   readonly currency: string;
@@ -70,7 +71,7 @@ export class Brapi {
   private baseURL = brapiResourceConfig.get<string>('apiUrl');
   private requestTickersAmountLimit = 10;
 
-  constructor(protected http: AxiosStatic) {}
+  constructor(protected http = new HTTPUtil.Request()) {}
 
   public async fetchQuotes(tickers: string[]): Promise<Asset[]> {
     try {
@@ -88,9 +89,9 @@ export class Brapi {
     } catch (err) {
       const axiosError = err as AxiosError;
 
-      if (axiosError.response && axiosError.response.status) {
+      if (HTTPUtil.Request.isRequestError(axiosError)) {
         throw new BrapiRequestError(
-          `Error: ${JSON.stringify(axiosError.response.data)} Code: ${axiosError.response.status}`
+          `Error: ${JSON.stringify(axiosError?.response?.data)} Code: ${axiosError?.response?.status}`
         );
       }
 
