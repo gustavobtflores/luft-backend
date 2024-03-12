@@ -42,13 +42,12 @@ export interface BrapiQuotesResponse {
   requestedAt: string;
 }
 
-export interface Asset {
-  regularMarketChange: number;
-  regularMarketChangePercent: number;
-  regularMarketTime: string;
-  regularMarketPrice: number;
-  symbol: string;
-  logourl: string;
+export interface Price {
+  currentChange: number;
+  currentChangePercent: number;
+  currentPrice: number;
+  ticker: string;
+  logoUrl: string;
 }
 
 export class ClientRequestError extends InternalError {
@@ -73,7 +72,7 @@ export class Brapi {
 
   constructor(protected http = new HTTPUtil.Request()) {}
 
-  public async fetchQuotes(tickers: string[]): Promise<Asset[]> {
+  public async fetchPrices(tickers: string[]): Promise<Price[]> {
     try {
       const response = await this.http.get<BrapiQuotesResponse>(
         `/quote/${tickers}`,
@@ -99,11 +98,7 @@ export class Brapi {
     }
   }
 
-  // public async fetchCryptos(coins: string[]): Promise<{}> {
-  //   return Promise.resolve({});
-  // }
-
-  private normalizeResponse(quotes: BrapiQuotesResponse): Asset[] {
+  private normalizeResponse(quotes: BrapiQuotesResponse): Price[] {
     return quotes.results
       .filter(this.isValidQuote.bind(this))
       .map(
@@ -112,15 +107,13 @@ export class Brapi {
           regularMarketChange,
           regularMarketChangePercent,
           regularMarketPrice,
-          regularMarketTime,
           symbol,
         }) => ({
-          logourl,
-          regularMarketChange,
-          regularMarketChangePercent,
-          regularMarketPrice,
-          regularMarketTime,
-          symbol,
+          logoUrl: logourl,
+          currentChange: regularMarketChange,
+          currentChangePercent: regularMarketChangePercent,
+          currentPrice: regularMarketPrice,
+          ticker: symbol,
         })
       );
   }
@@ -131,7 +124,6 @@ export class Brapi {
       quote.regularMarketChange &&
       quote.regularMarketChangePercent &&
       quote.regularMarketPrice &&
-      quote.regularMarketTime &&
       quote.symbol
     );
   }

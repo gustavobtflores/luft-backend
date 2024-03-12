@@ -1,10 +1,10 @@
 import { Controller, Get } from '@overnightjs/core';
 import { Request, Response } from 'express';
 
-@Controller('assets')
-export class AssetsController {
+@Controller('investments')
+export class InvestmentsController {
   @Get('')
-  public getAssetsForLoggedUser(_: Request, res: Response): void {
+  public getInvestmentsForLoggedUser(_: Request, res: Response): void {
     res.status(200).send([
       {
         symbol: 'ROXO34',

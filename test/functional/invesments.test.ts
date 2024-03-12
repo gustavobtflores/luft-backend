@@ -1,6 +1,6 @@
-describe('Holdings data functional tests', () => {
-  it('should return assets prices and info', async () => {
-    const { body, status } = await global.testRequest.get('/assets');
+describe('Investments data functional tests', () => {
+  it('should return investments data', async () => {
+    const { body, status } = await global.testRequest.get('/investments');
 
     expect(status).toBe(200);
     expect(body).toEqual([
