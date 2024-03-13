@@ -1,5 +1,5 @@
 {
-  "id": "8db73310-b474-46cd-a49d-cf88c7693901",
+  "id": "a6710da7-01df-478e-b7bb-dbe826519a3b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -20,8 +20,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "avg_price": {
-          "name": "avg_price",
+        "price": {
+          "name": "price",
           "type": "numeric(19, 8)",
           "primaryKey": false,
           "notNull": true
@@ -40,7 +40,7 @@
         },
         "type": {
           "name": "type",
-          "type": "ticker_type",
+          "type": "transaction_type",
           "primaryKey": false,
           "notNull": true
         },

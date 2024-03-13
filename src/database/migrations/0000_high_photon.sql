@@ -13,10 +13,10 @@ END $$;
 CREATE TABLE IF NOT EXISTS "transactions" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"ticker" varchar(20) NOT NULL,
-	"avg_price" numeric(19, 8) NOT NULL,
+	"price" numeric(19, 8) NOT NULL,
 	"quantity" numeric(19, 8) NOT NULL,
 	"ticker_type" "ticker_type" NOT NULL,
-	"type" "ticker_type" NOT NULL,
+	"type" "transaction_type" NOT NULL,
 	"date" date DEFAULT now(),
 	"created_at" timestamp DEFAULT now()
 );

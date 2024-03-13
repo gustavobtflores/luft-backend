@@ -5,6 +5,7 @@ import { Application } from 'express';
 import bodyParser from 'body-parser';
 import { InvestmentsController } from './controllers/investments';
 import * as database from '@src/database/db';
+import { TransactionsController } from './controllers/transactions';
 
 export class SetupServer extends Server {
   constructor(private port = 3000) {
@@ -24,7 +25,8 @@ export class SetupServer extends Server {
 
   private setupControllers(): void {
     const investmentsController = new InvestmentsController();
-    this.addControllers([investmentsController]);
+    const transactionsController = new TransactionsController();
+    this.addControllers([investmentsController, transactionsController]);
   }
 
   private async databaseSetup(): Promise<void> {

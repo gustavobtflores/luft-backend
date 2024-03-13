@@ -3,9 +3,8 @@ import brapiQuotesNormalizedFixture from '@test/fixtures/brapi_quotes_normalized
 import {
   Investments,
   InvestmentsProcessingInternalError,
-  TickerType,
-  Transaction,
 } from '../investments';
+import { TickerType, Transaction } from '@src/models/transaction';
 
 jest.mock('@src/clients/brapi');
 
@@ -13,8 +12,6 @@ describe('Investments service', () => {
   const mockedBrapiService = new Brapi() as jest.Mocked<Brapi>;
 
   it('should return investments data for a list of transactions', async () => {
-    /* para usar o método fetchQuotes precisaria instanciar a classe com new (por conta do acesso ao this), 
-    por isso a alteração com o prototype que permite substituir o método sem instanciar a classe */
     mockedBrapiService.fetchPrices.mockResolvedValue(
       brapiQuotesNormalizedFixture
     );
@@ -23,22 +20,35 @@ describe('Investments service', () => {
       {
         ticker: 'ROXO34',
         tickerType: TickerType.bdr,
-        avgPrice: 7.25,
         quantity: 10,
-        user: 'some-id',
+        price: 10,
+        type: 'buy',
+      },
+      {
+        ticker: 'ROXO34',
+        tickerType: TickerType.bdr,
+        quantity: 10,
+        price: 20,
+        type: 'buy',
+      },
+      {
+        ticker: 'ROXO34',
+        tickerType: TickerType.bdr,
+        quantity: 5,
+        price: 11,
+        type: 'sell',
       },
     ];
 
     const expectedResponse = [
       {
-        avgPrice: 7.25,
-        quantity: 10,
+        avgPrice: 15,
+        currentPrice: 8.25,
+        logoUrl: 'https://s3-symbol-logo.tradingview.com/nu-holdings--big.svg',
+        quantity: 20,
         ticker: 'ROXO34',
         tickerType: 'bdr',
-        currentPrice: 8.25,
-        currentChange: 0.21000004,
-        currentChangePercent: 2.6119406,
-        logoUrl: 'https://s3-symbol-logo.tradingview.com/nu-holdings--big.svg',
+        total: 300,
       },
     ];
 
@@ -61,9 +71,9 @@ describe('Investments service', () => {
       {
         ticker: 'ROXO34',
         tickerType: TickerType.bdr,
-        avgPrice: 7.25,
         quantity: 10,
-        user: 'some-id',
+        price: 10.9,
+        type: 'buy',
       },
     ];
 

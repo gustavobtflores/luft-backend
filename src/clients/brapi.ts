@@ -43,8 +43,6 @@ export interface BrapiQuotesResponse {
 }
 
 export interface Price {
-  currentChange: number;
-  currentChangePercent: number;
   currentPrice: number;
   ticker: string;
   logoUrl: string;
@@ -66,6 +64,7 @@ export class BrapiRequestError extends InternalError {
 
 const brapiResourceConfig: IConfig = config.get('App.resources.Brapi');
 
+//TODO: agrupar transações por tipo (crypto, stock) e alterar o service da Brapi pra lidar com isso e também com o limite de 10 tickers por requisição
 export class Brapi {
   private baseURL = brapiResourceConfig.get<string>('apiUrl');
   private requestTickersAmountLimit = 10;
@@ -101,30 +100,14 @@ export class Brapi {
   private normalizeResponse(quotes: BrapiQuotesResponse): Price[] {
     return quotes.results
       .filter(this.isValidQuote.bind(this))
-      .map(
-        ({
-          logourl,
-          regularMarketChange,
-          regularMarketChangePercent,
-          regularMarketPrice,
-          symbol,
-        }) => ({
-          logoUrl: logourl,
-          currentChange: regularMarketChange,
-          currentChangePercent: regularMarketChangePercent,
-          currentPrice: regularMarketPrice,
-          ticker: symbol,
-        })
-      );
+      .map(({ logourl, regularMarketPrice, symbol }) => ({
+        logoUrl: logourl,
+        currentPrice: regularMarketPrice,
+        ticker: symbol,
+      }));
   }
 
   private isValidQuote(quote: Partial<BrapiQuote>): boolean {
-    return !!(
-      quote.logourl &&
-      quote.regularMarketChange &&
-      quote.regularMarketChangePercent &&
-      quote.regularMarketPrice &&
-      quote.symbol
-    );
+    return !!(quote.logourl && quote.regularMarketPrice && quote.symbol);
   }
 }
