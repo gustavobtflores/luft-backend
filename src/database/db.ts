@@ -1,9 +1,11 @@
 import 'dotenv/config';
 import { drizzle } from 'drizzle-orm/node-postgres';
-import { Pool } from 'pg';
+import { Client } from 'pg';
 
-const pool = new Pool({
+const client = new Client({
   connectionString: process.env.DATABASE_URL,
 });
 
-export const db = drizzle(pool);
+export const connect = async () => await client.connect();
+export const close = async () => await client.end();
+export const db = drizzle(client);

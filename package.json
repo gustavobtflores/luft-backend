@@ -11,7 +11,7 @@
     "lint:fix": "eslint ./src ./test --ext .ts --fix",
     "style:check": "prettier --check src/**/*.ts test/**/*.ts",
     "style:fix": "prettier --write src/**/*.ts test/**/*.ts",
-    "test:functional": "jest --projects ./test --forceExit --runInBand --detectOpenHandles",
+    "test:functional": "jest --projects ./test --runInBand",
     "test:unit": "jest"
   },
   "author": "gustavobtflores",

@@ -3,7 +3,8 @@ import './utils/module-alias';
 import { Server } from '@overnightjs/core';
 import { Application } from 'express';
 import bodyParser from 'body-parser';
-import { AssetsController } from './controllers/assets';
+import { InvestmentsController } from './controllers/investments';
+import * as database from '@src/database/db';
 
 export class SetupServer extends Server {
   constructor(private port = 3000) {
@@ -13,6 +14,7 @@ export class SetupServer extends Server {
   public async init(): Promise<void> {
     this.setupExpress();
     this.setupControllers();
+    await this.databaseSetup();
   }
 
   private setupExpress(): void {
@@ -21,8 +23,16 @@ export class SetupServer extends Server {
   }
 
   private setupControllers(): void {
-    const assetsController = new AssetsController();
-    this.addControllers([assetsController]);
+    const investmentsController = new InvestmentsController();
+    this.addControllers([investmentsController]);
+  }
+
+  private async databaseSetup(): Promise<void> {
+    await database.connect();
+  }
+
+  public async close(): Promise<void> {
+    await database.close();
   }
 
   public getApp(): Application {
