@@ -42,6 +42,8 @@ describe('Investments service', () => {
 
     const expectedResponse = [
       {
+        appreciation: -135,
+        appreciationPercent: -0.45,
         avgPrice: 15,
         currentPrice: 8.25,
         logoUrl: 'https://s3-symbol-logo.tradingview.com/nu-holdings--big.svg',

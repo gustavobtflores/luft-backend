@@ -1,5 +1,6 @@
 {
   "App": {
+    "port": "9000",
     "resources": {
       "Brapi": {
         "apiUrl": "https://brapi.dev/api",
