@@ -16,11 +16,7 @@ export enum TransactionType {
 
 type NewTransaction = typeof transactions.$inferInsert;
 
-export interface Transaction
-  extends Omit<NewTransaction, 'price' | 'quantity'> {
-  price: number;
-  quantity: number;
-}
+export interface Transaction extends NewTransaction {}
 
 export const transactionSchema = z.object({
   ticker: z.string(),
@@ -31,7 +27,11 @@ export const transactionSchema = z.object({
   date: z.coerce.date().optional(),
 });
 
-export const create = async (transaction: NewTransaction) => {
+export const find = () => {
+  return db.query.transactions.findMany();
+};
+
+export const create = (transaction: NewTransaction) => {
   return db.insert(transactions).values(transaction).returning();
 };
 

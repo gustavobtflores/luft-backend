@@ -7,7 +7,10 @@ interface ConsolidatedTransaction extends Omit<Transaction, 'price' | 'type'> {
   total: number;
 }
 
-export interface Investment extends ConsolidatedTransaction, Price {}
+export interface Investment extends ConsolidatedTransaction, Price {
+  appreciation: number;
+  appreciationPercent: number;
+}
 
 export class InvestmentsProcessingInternalError extends InternalError {
   constructor(message: string) {
@@ -52,6 +55,10 @@ export class Investments {
     return {
       ...price,
       ...transaction,
+      appreciation:
+        transaction.quantity * price.currentPrice - transaction.total,
+      appreciationPercent:
+        (price.currentPrice - transaction.avgPrice) / transaction.avgPrice,
     };
   }
 

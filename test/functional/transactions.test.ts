@@ -15,8 +15,8 @@ describe('Transactions functional tests', () => {
 
       const expectedResponse = {
         date: '2024-01-02',
-        price: '25.69000000',
-        quantity: '8.00000000',
+        price: 25.69,
+        quantity: 8,
         ticker: 'ROXO34',
         tickerType: 'bdr',
         type: 'buy',
