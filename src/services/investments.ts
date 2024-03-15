@@ -62,19 +62,26 @@ export class Investments {
     };
   }
 
+  //TODO: a lógica desse método precisa ser melhorada, talvez extraindo partes do código para funções
+  //ou se aproveitando de um
   private transformTransactionsToConsolidated(
     transactions: Transaction[]
   ): Record<string, ConsolidatedTransaction> {
-    const consolidated = transactions
-      .filter((transaction) => transaction.type === 'buy')
-      .reduce(
-        (acc, curr: Transaction) => {
-          if (acc[curr.ticker]) {
+    const consolidated = transactions.reduce(
+      (acc, curr: Transaction) => {
+        if (acc[curr.ticker]) {
+          if (curr.type === 'buy') {
             acc[curr.ticker].quantity += curr.quantity;
-            acc[curr.ticker].total += curr.quantity * curr.price;
-            acc[curr.ticker].avgPrice =
-              acc[curr.ticker].total / acc[curr.ticker].quantity;
           } else {
+            acc[curr.ticker].quantity -= curr.quantity;
+          }
+
+          acc[curr.ticker].total =
+            acc[curr.ticker].avgPrice * acc[curr.ticker].quantity;
+          acc[curr.ticker].avgPrice =
+            acc[curr.ticker].total / acc[curr.ticker].quantity;
+        } else {
+          if (curr.type === 'buy') {
             acc[curr.ticker] = {
               quantity: curr.quantity,
               ticker: curr.ticker,
@@ -82,12 +89,21 @@ export class Investments {
               avgPrice: curr.price,
               total: curr.price * curr.quantity,
             };
+          } else {
+            acc[curr.ticker] = {
+              quantity: -curr.quantity,
+              ticker: curr.ticker,
+              tickerType: curr.tickerType,
+              avgPrice: 0,
+              total: -curr.price * curr.quantity,
+            };
           }
+        }
 
-          return acc;
-        },
-        {} as Record<string, ConsolidatedTransaction>
-      );
+        return acc;
+      },
+      {} as Record<string, ConsolidatedTransaction>
+    );
 
     return consolidated;
   }

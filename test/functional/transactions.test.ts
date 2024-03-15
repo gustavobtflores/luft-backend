@@ -45,7 +45,8 @@ describe('Transactions functional tests', () => {
         .send(newTransaction);
       expect(status).toBe(422);
       expect(body).toEqual({
-        error: 'Transaction validation error: Invalid date',
+        code: 422,
+        error: { date: ['Invalid date'] },
       });
     });
   });

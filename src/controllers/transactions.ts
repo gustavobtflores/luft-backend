@@ -2,9 +2,10 @@ import { Controller, Post } from '@overnightjs/core';
 import { Request, Response } from 'express';
 import * as TransactionModel from '@src/models/transaction';
 import { ZodError } from 'zod';
+import { BaseController } from '.';
 
 @Controller('transactions')
-export class TransactionsController {
+export class TransactionsController extends BaseController {
   @Post('')
   public async create(req: Request, res: Response): Promise<void> {
     try {
@@ -13,17 +14,7 @@ export class TransactionsController {
 
       res.status(201).send({ ...transaction[0] });
     } catch (err) {
-      if (err instanceof ZodError) {
-        //TODO: implementar uma classe de erro (talvez ValidationError()) para tratar melhor os erros de validação
-        // retornar para o front-end algo no formato {fields: {date: 'Invalid date', price: 'Price must be a number'}}
-        res.status(422).send({
-          error: `Transaction validation error: ${(err as ZodError).errors[0].message}`,
-        });
-      } else {
-        res.status(500).send({
-          error: 'Internal Server Error',
-        });
-      }
+      this.sendCreatedUpdateErrorResponse(res, err as ZodError | Error);
     }
   }
 }

@@ -8,6 +8,20 @@
       "when": 1710296077158,
       "tag": "0000_high_photon",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1710381505129,
+      "tag": "0001_majestic_silverclaw",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1710433246589,
+      "tag": "0002_daffy_wong",
+      "breakpoints": true
     }
   ]
 }

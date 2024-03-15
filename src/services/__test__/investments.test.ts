@@ -21,36 +21,29 @@ describe('Investments service', () => {
         ticker: 'ROXO34',
         tickerType: TickerType.bdr,
         quantity: 10,
-        price: 10,
-        type: 'buy',
-      },
-      {
-        ticker: 'ROXO34',
-        tickerType: TickerType.bdr,
-        quantity: 10,
-        price: 20,
+        price: 7.25,
         type: 'buy',
       },
       {
         ticker: 'ROXO34',
         tickerType: TickerType.bdr,
         quantity: 5,
-        price: 11,
+        price: 10,
         type: 'sell',
       },
     ];
 
     const expectedResponse = [
       {
-        appreciation: -135,
-        appreciationPercent: -0.45,
-        avgPrice: 15,
+        appreciation: 5,
+        appreciationPercent: 0.13793103448275862,
+        avgPrice: 7.25,
         currentPrice: 8.25,
         logoUrl: 'https://s3-symbol-logo.tradingview.com/nu-holdings--big.svg',
-        quantity: 20,
+        quantity: 5,
         ticker: 'ROXO34',
         tickerType: 'bdr',
-        total: 300,
+        total: 36.25,
       },
     ];
 
