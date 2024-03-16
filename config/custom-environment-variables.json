@@ -1,11 +1,14 @@
 {
   "App": {
-    "port": "APP_PORT",
+    "port": "PORT",
     "resources": {
       "Brapi": {
         "apiUrl": "BRAPI_API_URL",
         "apiToken": "BRAPI_API_TOKEN"
       }
+    },
+    "database": {
+      "postgresUrl": "POSTGRES_URL"
     },
     "auth": {
       "key": "JWT_SECRET_KEY"

@@ -4,6 +4,12 @@
       "Brapi": {
         "apiToken": "test-token"
       }
+    },
+    "database": {
+      "postgresUrl": "postgres://postgres:postgres@localhost:5555/luft"
+    },
+    "logger": {
+      "enabled": false
     }
   }
 }

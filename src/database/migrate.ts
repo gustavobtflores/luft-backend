@@ -1,15 +1,16 @@
 import 'dotenv/config';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import { db, connection } from './db';
+import logger from '@src/logger';
 
 async function main() {
   await connection.connect();
 
-  console.log('Running migrations');
+  logger.info('Running database migrations');
 
   await migrate(db, { migrationsFolder: 'src/database/migrations' });
 
-  console.log('Migrated successfully');
+  logger.info('Database migrated successfully');
 
   await connection.close();
 
@@ -17,7 +18,6 @@ async function main() {
 }
 
 main().catch((err) => {
-  console.log('Migration failed');
-  console.error(err);
+  logger.error(`Migration failed with error: ${err}`);
   process.exit(1);
 });

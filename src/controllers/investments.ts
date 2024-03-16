@@ -3,12 +3,14 @@ import { Request, Response } from 'express';
 import * as TransactionModel from '@src/models/transaction';
 import { Investments } from '@src/services/investments';
 import { authMiddleware } from '@src/middlewares/auth';
+import logger from '@src/logger';
+import { BaseController } from '.';
 
 const investment = new Investments();
 
 @Controller('investments')
 @ClassMiddleware(authMiddleware)
-export class InvestmentsController {
+export class InvestmentsController extends BaseController {
   @Get('')
   public async getInvestmentsForLoggedUser(
     req: Request,
@@ -23,7 +25,11 @@ export class InvestmentsController {
 
       res.status(200).send(investmentsData);
     } catch (err) {
-      res.status(500).send({ error: 'Something went wrong' });
+      logger.error(err);
+      this.sendErrorResponse(res, {
+        code: 500,
+        message: 'Something went wrong',
+      });
     }
   }
 }

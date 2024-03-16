@@ -21,7 +21,9 @@ export class AuthService {
   }
 
   public static generateToken(payload: object) {
-    return jwt.sign(payload, config.get('App.auth.key'));
+    return jwt.sign(payload, config.get<string>('App.auth.key'), {
+      expiresIn: 3600,
+    });
   }
 
   public static decodeToken(token: string): DecodedUser {

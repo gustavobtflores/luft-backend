@@ -7,8 +7,15 @@
         "apiToken": "test"
       }
     },
+    "database": {
+      "postgresUrl": "postgres://postgres:postgres@localhost:5555/luft"
+    },
     "auth": {
       "key": "some-key"
+    },
+    "logger": {
+      "enabled": true,
+      "level": "info"
     }
   }
 }

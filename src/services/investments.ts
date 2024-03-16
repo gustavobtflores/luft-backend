@@ -1,4 +1,5 @@
 import { Brapi, Price } from '@src/clients/brapi';
+import logger from '@src/logger';
 import { Transaction } from '@src/models/transaction';
 import { InternalError } from '@src/utils/errors/internal-error';
 
@@ -25,6 +26,14 @@ export class Investments {
   public async processInvestmentsForTransactions(
     transactions: Transaction[]
   ): Promise<Price[]> {
+    logger.info(
+      `Preparing a user investments for ${transactions.length} transactions`
+    );
+
+    if (transactions.length <= 0) {
+      return [];
+    }
+
     try {
       const pricesWithCorrectSources: Investment[] = [];
       const tickers = transactions.map((transaction) => transaction.ticker);
@@ -45,6 +54,7 @@ export class Investments {
 
       return pricesWithCorrectSources;
     } catch (err) {
+      logger.error(err);
       throw new InvestmentsProcessingInternalError((err as Error).message);
     }
   }

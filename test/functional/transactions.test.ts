@@ -61,7 +61,11 @@ describe('Transactions functional tests', () => {
       expect(status).toBe(422);
       expect(body).toEqual({
         code: 422,
-        error: { date: ['Invalid date'] },
+        error: 'Unprocessable Entity',
+        message: 'Error validating request',
+        params: {
+          date: ['Invalid date'],
+        },
       });
     });
   });

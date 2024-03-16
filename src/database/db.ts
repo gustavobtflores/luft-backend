@@ -1,10 +1,10 @@
-import 'dotenv/config';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Client } from 'pg';
 import * as schema from './schema';
+import config from 'config';
 
 const client = new Client({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: config.get('App.database.postgresUrl'),
 });
 
 export const connection = {
