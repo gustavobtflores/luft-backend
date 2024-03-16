@@ -31,7 +31,7 @@ jobs:
         run: yarn --frozen-lockfile
 
       - name: Run lint check
-        run: yarn lint:check
+        run: yarn lint
 
       - name: Run database migrations
         run: yarn db:migrate
