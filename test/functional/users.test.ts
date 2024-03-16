@@ -20,7 +20,7 @@ describe('Users functional tests', () => {
       );
     });
 
-    it.skip('should return 422 when there is a validation error', async () => {
+    it('should return 422 when there is a validation error', async () => {
       const newUser = {
         name: 'John Doe',
         email: 'johndoe@email.com',
@@ -33,6 +33,25 @@ describe('Users functional tests', () => {
         code: 422,
         error: { password: ['password is required'] },
       });
+    });
+  });
+
+  describe('When authenticating a user', () => {
+    it('should generate a token for a valid user', async () => {
+      const newUser = {
+        name: 'John Doe',
+        email: 'johndoe@email.com',
+        password: 'password',
+      };
+
+      await UserModel.create(newUser);
+      const response = await global.testRequest
+        .post('/users/authenticate')
+        .send({ email: newUser.email, password: newUser.password });
+
+      expect(response.body).toEqual(
+        expect.objectContaining({ token: expect.any(String) })
+      );
     });
   });
 });

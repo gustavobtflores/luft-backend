@@ -1,5 +1,6 @@
 import { db } from '@src/database/db';
 import { transactions } from '@src/database/schema';
+import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 
 export enum TickerType {
@@ -27,8 +28,10 @@ export const transactionSchema = z.object({
   date: z.coerce.date().optional(),
 });
 
-export const find = () => {
-  return db.query.transactions.findMany();
+export const find = ({ userId }: { userId: string | undefined }) => {
+  return db.query.transactions.findMany({
+    where: eq(transactions.userId, userId as string),
+  });
 };
 
 export const create = (transaction: NewTransaction) => {

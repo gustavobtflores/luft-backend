@@ -1,7 +1,20 @@
+import * as UserModel from '@src/models/user';
 import * as TransactionsModel from '@src/models/transaction';
+import { AuthService } from '@src/services/auth';
 
 describe('Transactions functional tests', () => {
-  beforeAll(async () => await TransactionsModel.remove());
+  const defaultUser = {
+    email: 'john@email.com',
+    name: 'John Doe',
+    password: 'password',
+  };
+  let token: string;
+  beforeEach(async () => {
+    await TransactionsModel.remove();
+    await UserModel.remove();
+    const user = await UserModel.create(defaultUser);
+    token = AuthService.generateToken(user);
+  });
   describe('When creating a transaction', () => {
     it('should create a transaction with success', async () => {
       const newTransaction = {
@@ -24,6 +37,7 @@ describe('Transactions functional tests', () => {
 
       const response = await global.testRequest
         .post('/transactions')
+        .set({ 'x-access-token': token })
         .send(newTransaction);
 
       expect(response.status).toBe(201);
@@ -42,6 +56,7 @@ describe('Transactions functional tests', () => {
 
       const { status, body } = await global.testRequest
         .post('/transactions')
+        .set({ 'x-access-token': token })
         .send(newTransaction);
       expect(status).toBe(422);
       expect(body).toEqual({

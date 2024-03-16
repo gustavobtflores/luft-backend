@@ -4,7 +4,11 @@ import {
   Investments,
   InvestmentsProcessingInternalError,
 } from '../investments';
-import { TickerType, Transaction } from '@src/models/transaction';
+import {
+  TickerType,
+  Transaction,
+  TransactionType,
+} from '@src/models/transaction';
 
 jest.mock('@src/clients/brapi');
 
@@ -16,20 +20,22 @@ describe('Investments service', () => {
       brapiQuotesNormalizedFixture
     );
 
-    const transactions: Transaction[] = [
+    const transactions = [
       {
         ticker: 'ROXO34',
         tickerType: TickerType.bdr,
         quantity: 10,
         price: 7.25,
-        type: 'buy',
+        type: TransactionType.buy,
+        userId: '497dfbe3-6fbb-4f88-aae7-0e385589a623',
       },
       {
         ticker: 'ROXO34',
         tickerType: TickerType.bdr,
         quantity: 5,
         price: 10,
-        type: 'sell',
+        type: TransactionType.sell,
+        userId: '497dfbe3-6fbb-4f88-aae7-0e385589a623',
       },
     ];
 
@@ -69,6 +75,7 @@ describe('Investments service', () => {
         quantity: 10,
         price: 10.9,
         type: 'buy',
+        userId: '497dfbe3-6fbb-4f88-aae7-0e385589a623',
       },
     ];
 

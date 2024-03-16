@@ -1,17 +1,26 @@
 import { db } from '@src/database/db';
 import { users } from '@src/database/schema';
 import { AuthService } from '@src/services/auth';
-import { z } from 'zod';
+import { SQL, and, eq } from 'drizzle-orm';
 
-export const userSchema = z.object({});
+export const findOne = async ({ ...fields }: Partial<User>) => {
+  const filters = Object.entries(fields).reduce((acc, [key, value]) => {
+    acc.push(eq(users[key as keyof User], value));
 
-export const find = () => {
-  return db.query.users.findMany();
+    return acc;
+  }, [] as SQL<unknown>[]);
+
+  const user = await db
+    .select()
+    .from(users)
+    .where(and(...filters));
+
+  return user[0];
 };
 
 type NewUser = typeof users.$inferInsert;
 
-interface User extends NewUser {}
+export interface User extends NewUser {}
 
 export const create = async (user: User) => {
   const hashedPassword = await AuthService.hashPassword(user.password);
@@ -20,7 +29,9 @@ export const create = async (user: User) => {
     password: hashedPassword,
   };
 
-  return db.insert(users).values(newUser).returning();
+  const queryReturn = await db.insert(users).values(newUser).returning();
+
+  return queryReturn[0];
 };
 
 export const remove = () => {

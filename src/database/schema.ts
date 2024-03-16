@@ -37,6 +37,9 @@ export const transactions = pgTable('transactions', {
   type: transactionType('type').notNull(),
   date: date('date').defaultNow(),
   createdAt: timestamp('created_at').defaultNow(),
+  userId: uuid('user_id')
+    .references(() => users.id, { onDelete: 'cascade' })
+    .notNull(),
 });
 
 export const users = pgTable('users', {

@@ -2,7 +2,8 @@ import { Brapi, Price } from '@src/clients/brapi';
 import { Transaction } from '@src/models/transaction';
 import { InternalError } from '@src/utils/errors/internal-error';
 
-interface ConsolidatedTransaction extends Omit<Transaction, 'price' | 'type'> {
+interface ConsolidatedTransaction
+  extends Omit<Transaction, 'price' | 'type' | 'userId'> {
   avgPrice: number;
   total: number;
 }

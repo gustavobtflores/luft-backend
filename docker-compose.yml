@@ -1,0 +1,12 @@
+db:
+  image: postgres:alpine
+  ports:
+    - '5555:5432'
+  environment:
+    POSTGRES_PASSWORD: postgres
+    POSTGRES_USER: postgres
+    POSTGRES_DB: luft
+    TZ: 'GMT-3'
+    PGTZ: 'GMT-3'
+  # volumes:
+  #   - ./postgres:/var/lib/postgresql/data
