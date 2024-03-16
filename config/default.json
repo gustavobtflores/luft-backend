@@ -4,7 +4,7 @@
     "resources": {
       "Brapi": {
         "apiUrl": "https://brapi.dev/api",
-        "apiToken": "fjdd2epfCWVgXLXSrkxP7v"
+        "apiToken": "test"
       }
     },
     "auth": {

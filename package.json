@@ -13,7 +13,8 @@
     "style:fix": "prettier --write src/**/*.ts test/**/*.ts",
     "test": "yarn test:functional && yarn test:unit",
     "test:functional": "jest --projects ./test --runInBand --detectOpenHandles",
-    "test:unit": "jest"
+    "test:unit": "jest",
+    "db:migrate": "yarn build && node dist/src/database/migrate.js"
   },
   "author": "gustavobtflores",
   "license": "ISC",

@@ -7,6 +7,11 @@ const client = new Client({
   connectionString: process.env.DATABASE_URL,
 });
 
+export const connection = {
+  connect: async () => await client.connect(),
+  close: async () => await client.end(),
+};
+
 export const connect = async () => await client.connect();
 export const close = async () => await client.end();
 export const db = drizzle(client, { schema });

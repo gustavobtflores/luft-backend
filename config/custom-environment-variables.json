@@ -1,0 +1,14 @@
+{
+  "App": {
+    "port": "APP_PORT",
+    "resources": {
+      "Brapi": {
+        "apiUrl": "BRAPI_API_URL",
+        "apiToken": "BRAPI_API_TOKEN"
+      }
+    },
+    "auth": {
+      "key": "JWT_SECRET_KEY"
+    }
+  }
+}
