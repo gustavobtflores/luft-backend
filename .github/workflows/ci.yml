@@ -40,4 +40,4 @@ jobs:
         run: yarn test
 
 env:
-  DATABASE_URL: 'postgres://postgres:postgres@postgres:5432/luft'
+  POSTGRES_URL: 'postgres://postgres:postgres@postgres:5432/luft'
