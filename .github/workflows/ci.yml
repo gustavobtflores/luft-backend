@@ -21,7 +21,7 @@ jobs:
           --health-timeout 5s
           --health-retries 5
         ports:
-          - 5555:5432
+          - 5432:5432
 
     steps:
       - name: Check out repository code
@@ -38,5 +38,6 @@ jobs:
 
       - name: Run all tests
         run: yarn test
-        env:
-          DATABASE_URL: 'postgres://postgres:postgres@localhost:5555/luft'
+
+env:
+  DATABASE_URL: 'postgres://postgres:postgres@postgres:5432/luft'
