@@ -12,7 +12,7 @@ export function authMiddleware(
     const decoded = AuthService.decodeToken(token as string);
     req.decoded = decoded;
   } catch (err) {
-    res.status?.(401).send({ code: 401, error: (err as Error).message });
+    return res.status?.(401).send({ code: 401, error: (err as Error).message });
   }
 
   next();
