@@ -21,7 +21,7 @@ describe('Brapi client', () => {
     } as HTTPUtil.Response);
 
     const brapi = new Brapi(mockedRequest);
-    const response = await brapi.fetchPrices(tickers);
+    const response = await brapi.fetchStocks(tickers);
     expect(response).toEqual(brapiQuotesNormalizedFixture);
   });
 
@@ -41,7 +41,7 @@ describe('Brapi client', () => {
     } as HTTPUtil.Response);
 
     const brapi = new Brapi(mockedRequest);
-    const response = await brapi.fetchPrices(tickers);
+    const response = await brapi.fetchStocks(tickers);
     expect(response).toEqual([]);
   });
 
@@ -51,7 +51,7 @@ describe('Brapi client', () => {
 
     const brapi = new Brapi(mockedRequest);
 
-    await expect(brapi.fetchPrices(tickers)).rejects.toThrow(
+    await expect(brapi.fetchStocks(tickers)).rejects.toThrow(
       'Unexpected error when trying to communicate to Brapi: Network Error'
     );
   });
@@ -73,7 +73,7 @@ describe('Brapi client', () => {
 
     const brapi = new Brapi(mockedRequest);
 
-    await expect(brapi.fetchPrices(tickers)).rejects.toThrow(
+    await expect(brapi.fetchStocks(tickers)).rejects.toThrow(
       'Unexpected error returned by Brapi service: Error: {"error":true,"message":"Você atingiu o limite de requisições para o seu plano. Por favor, considere fazer um upgrade para um plano melhor em brapi.dev/dashboard"} Code: 402'
     );
   });

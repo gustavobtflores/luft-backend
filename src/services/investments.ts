@@ -30,14 +30,13 @@ export class Investments {
       `Preparing a user investments for ${transactions.length} transactions`
     );
 
-    if (transactions.length <= 0) {
+    if (transactions.length === 0) {
       return [];
     }
 
     try {
       const pricesWithCorrectSources: Investment[] = [];
-      const tickers = transactions.map((transaction) => transaction.ticker);
-      const prices = await this.brapi.fetchPrices(tickers);
+      const prices = await this.processPricesData(transactions);
       const consolidatedTransactions =
         this.transformTransactionsToConsolidated(transactions);
 
@@ -74,7 +73,6 @@ export class Investments {
   }
 
   //TODO: a lógica desse método precisa ser melhorada, talvez extraindo partes do código para funções
-  //ou se aproveitando de um
   private transformTransactionsToConsolidated(
     transactions: Transaction[]
   ): Record<string, ConsolidatedTransaction> {
@@ -117,5 +115,26 @@ export class Investments {
     );
 
     return consolidated;
+  }
+
+  private async processPricesData(
+    transactions: Transaction[]
+  ): Promise<Price[]> {
+    const tickers = transactions
+      .filter((transaction) =>
+        ['reit', 'bdr', 'stock'].includes(transaction.tickerType)
+      )
+      .map((transaction) => transaction.ticker);
+
+    const coins = transactions
+      .filter((transaction) => transaction.tickerType === 'crypto')
+      .map((transaction) => transaction.ticker);
+
+    const tickersData = await this.brapi.fetchStocks(tickers);
+    const coinsData = await this.brapi.fetchCrypto(coins);
+
+    const prices = [...tickersData, ...coinsData];
+
+    return prices;
   }
 }

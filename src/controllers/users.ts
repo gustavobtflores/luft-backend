@@ -41,7 +41,9 @@ export class UsersController extends BaseController {
   @Post('authenticate')
   public async authenticate(req: Request, res: Response): Promise<void> {
     await userCredentialsSchema.parseAsync(req.body);
-    const user = await UserModel.findOne({ email: req.body.email });
+    const user = await UserModel.findOne({
+      filters: { email: req.body.email },
+    });
 
     if (!user) {
       return this.sendErrorResponse(res, {
@@ -64,6 +66,7 @@ export class UsersController extends BaseController {
       name: user.name,
       id: user.id,
     });
+
     res.status(200).send({ token });
   }
 
@@ -71,7 +74,10 @@ export class UsersController extends BaseController {
   @Middleware(authMiddleware)
   public async me(req: Request, res: Response) {
     try {
-      const user = await UserModel.findOne({ id: req.decoded?.id });
+      const user = await UserModel.findOne({
+        filters: { id: req.decoded?.id },
+        columns: ['email', 'id', 'name'],
+      });
 
       if (!user) {
         return this.sendErrorResponse(res, {
@@ -82,7 +88,7 @@ export class UsersController extends BaseController {
 
       return res.status(200).send({ user });
     } catch (err) {
-      this.sendErrorResponse(res, {
+      return this.sendErrorResponse(res, {
         code: 500,
         message: 'Something went wrong',
       });

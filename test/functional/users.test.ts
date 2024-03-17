@@ -77,7 +77,9 @@ describe('Users functional tests', () => {
         .set({ 'x-access-token': token });
 
       expect(response.status).toBe(200);
-      expect(response.body).toMatchObject({ user });
+      expect(response.body).toMatchObject({
+        user: { email: user.email, id: user.id, name: user.name },
+      });
     });
 
     it("should return Not Found when the user doesn't exist", async () => {

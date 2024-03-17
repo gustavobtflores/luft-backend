@@ -1,0 +1,26 @@
+[
+  {
+    "ticker": "ROXO34",
+    "tickerType": "bdr",
+    "quantity": 10,
+    "price": 7.25,
+    "type": "buy",
+    "userId": "497dfbe3-6fbb-4f88-aae7-0e385589a623"
+  },
+  {
+    "ticker": "ROXO34",
+    "tickerType": "bdr",
+    "quantity": 5,
+    "price": 10,
+    "type": "sell",
+    "userId": "497dfbe3-6fbb-4f88-aae7-0e385589a623"
+  },
+  {
+    "ticker": "BTC",
+    "tickerType": "crypto",
+    "quantity": 1,
+    "price": 120000,
+    "type": "buy",
+    "userId": "497dfbe3-6fbb-4f88-aae7-0e385589a623"
+  }
+]

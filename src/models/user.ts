@@ -2,18 +2,36 @@ import { db } from '@src/database/db';
 import { users } from '@src/database/schema';
 import { AuthService } from '@src/services/auth';
 import { SQL, and, eq } from 'drizzle-orm';
+import { PgColumn } from 'drizzle-orm/pg-core';
 
-export const findOne = async ({ ...fields }: Partial<User>) => {
-  const filters = Object.entries(fields).reduce((acc, [key, value]) => {
+interface FindOne {
+  filters: Partial<User>;
+  columns?: (keyof User)[];
+}
+
+export const findOne = async ({
+  filters,
+  columns = ['email', 'id', 'name', 'password'],
+}: FindOne) => {
+  const where = Object.entries(filters).reduce((acc, [key, value]) => {
     acc.push(eq(users[key as keyof User], value));
 
     return acc;
   }, [] as SQL<unknown>[]);
 
+  const select = columns.reduce(
+    (acc, col) => {
+      acc[col] = users[col];
+
+      return acc;
+    },
+    {} as Record<string, PgColumn>
+  );
+
   const user = await db
-    .select()
+    .select(select)
     .from(users)
-    .where(and(...filters));
+    .where(and(...where));
 
   return user[0];
 };

@@ -1,7 +1,7 @@
 import { InternalError } from '@src/utils/errors/internal-error';
 import config, { IConfig } from 'config';
 import * as HTTPUtil from '@src/utils/request';
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 
 export interface BrapiQuote {
   readonly currency: string;
@@ -38,8 +38,27 @@ export interface BrapiQuote {
 
 export interface BrapiQuotesResponse {
   results: BrapiQuote[];
-  took: string;
-  requestedAt: string;
+}
+
+export interface BrapiCrypto {
+  currency: string;
+  currencyRateFromUSD: number;
+  coinName: string;
+  coin: string;
+  regularMarketChange: number;
+  regularMarketPrice: number;
+  regularMarketChangePercent: number;
+  regularMarketDayLow: number;
+  regularMarketDayHigh: number;
+  regularMarketDayRange: string;
+  regularMarketVolume: number;
+  marketCap: number;
+  regularMarketTime: string;
+  coinImageUrl: string;
+}
+
+export interface BrapiCryptoResponse {
+  coins: BrapiCrypto[];
 }
 
 export interface Price {
@@ -64,26 +83,33 @@ export class BrapiRequestError extends InternalError {
 
 const brapiResourceConfig: IConfig = config.get('App.resources.Brapi');
 
-//TODO: agrupar transações por tipo (crypto, stock) e alterar o service da Brapi pra lidar com isso e também com o limite de 10 tickers por requisição
 export class Brapi {
   private baseURL = brapiResourceConfig.get<string>('apiUrl');
   private requestTickersAmountLimit = 10;
 
   constructor(protected http = new HTTPUtil.Request()) {}
 
-  public async fetchPrices(tickers: string[]): Promise<Price[]> {
+  public async fetchStocks(tickers: string[]): Promise<Price[]> {
+    if (tickers.length === 0) return [];
+
     try {
-      const response = await this.http.get<BrapiQuotesResponse>(
-        `/quote/${tickers}`,
-        {
+      const stockPromises = this.createPromisesBasedLimit<
+        AxiosResponse<BrapiQuotesResponse>
+      >(tickers, (tickers) =>
+        this.http.get(`/quote/${tickers.join(',')}`, {
           baseURL: this.baseURL,
           headers: {
             Authorization: `Bearer ${brapiResourceConfig.get('apiToken')}`,
           },
-        }
+        })
       );
 
-      return this.normalizeResponse(response.data);
+      const response =
+        await Promise.all<AxiosResponse<BrapiQuotesResponse>>(stockPromises);
+
+      return this.normalizeStocksResponse(
+        response.map(({ data }) => data.results).flat()
+      );
     } catch (err) {
       const axiosError = err as AxiosError;
 
@@ -97,17 +123,65 @@ export class Brapi {
     }
   }
 
-  private normalizeResponse(quotes: BrapiQuotesResponse): Price[] {
-    return quotes.results
-      .filter(this.isValidQuote.bind(this))
-      .map(({ logourl, regularMarketPrice, symbol }) => ({
-        logoUrl: logourl,
-        currentPrice: regularMarketPrice,
-        ticker: symbol,
-      }));
+  public async fetchCrypto(cryptos: string[]) {
+    if (cryptos.length === 0) return [];
+
+    const cryptoPromises = this.createPromisesBasedLimit(cryptos, (coins) =>
+      this.http.get<BrapiCryptoResponse>(`/v2/crypto?coin=${coins.join(',')}`, {
+        baseURL: this.baseURL,
+        headers: {
+          Authorization: `Bearer ${brapiResourceConfig.get('apiToken')}`,
+        },
+      })
+    );
+
+    const response =
+      await Promise.all<AxiosResponse<BrapiCryptoResponse>>(cryptoPromises);
+
+    return this.normalizeCryptosResponse(
+      response.map(({ data }) => data.coins).flat()
+    );
+  }
+
+  private normalizeStocksResponse(quotes: BrapiQuote[]): Price[] {
+    return quotes.filter(this.isValidQuote.bind(this)).map((quote) => ({
+      logoUrl: quote.logourl,
+      currentPrice: quote.regularMarketPrice,
+      ticker: quote.symbol,
+    }));
+  }
+
+  private normalizeCryptosResponse(coins: BrapiCrypto[]): Price[] {
+    console.log(coins);
+
+    return coins.filter(this.isValidCrypto.bind(this)).map((coin) => ({
+      logoUrl: coin.coinImageUrl,
+      currentPrice: coin.regularMarketPrice,
+      ticker: coin.coin,
+    }));
   }
 
   private isValidQuote(quote: Partial<BrapiQuote>): boolean {
     return !!(quote.logourl && quote.regularMarketPrice && quote.symbol);
+  }
+
+  private isValidCrypto(crypto: Partial<BrapiCrypto>): boolean {
+    return !!(crypto.coinImageUrl && crypto.regularMarketPrice && crypto.coin);
+  }
+
+  private createPromisesBasedLimit<T>(
+    tickers: string[],
+    callback: (tickers: string[]) => Promise<T>
+  ): Promise<T>[] {
+    const tickersCopy = [...tickers];
+    const promises = [];
+
+    while (tickersCopy.length) {
+      promises.push(
+        callback(tickersCopy.splice(0, this.requestTickersAmountLimit))
+      );
+    }
+
+    return promises;
   }
 }
