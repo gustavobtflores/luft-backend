@@ -15,5 +15,5 @@ export function authMiddleware(
     return res.status?.(401).send({ code: 401, error: (err as Error).message });
   }
 
-  next();
+  return next();
 }

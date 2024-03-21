@@ -152,8 +152,6 @@ export class Brapi {
   }
 
   private normalizeCryptosResponse(coins: BrapiCrypto[]): Price[] {
-    console.log(coins);
-
     return coins.filter(this.isValidCrypto.bind(this)).map((coin) => ({
       logoUrl: coin.coinImageUrl,
       currentPrice: coin.regularMarketPrice,
