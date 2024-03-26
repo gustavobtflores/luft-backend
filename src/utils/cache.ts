@@ -1,5 +1,6 @@
 import { RedisClientConnection, redisClient } from '@src/cache/redis';
 import { Price } from '@src/clients/brapi';
+import config from 'config';
 
 class CacheUtil {
   constructor(protected cacheService: RedisClientConnection = redisClient) {}
@@ -23,7 +24,9 @@ class CacheUtil {
   }
 
   public async set<T>(key: string, value: T): Promise<void> {
-    await this.cacheService.set(key, JSON.stringify(value));
+    await this.cacheService.set(key, JSON.stringify(value), {
+      EX: config.get('App.cache.TTL'),
+    });
   }
 
   public async clear(): Promise<void> {

@@ -14,7 +14,8 @@
       "key": "some-key"
     },
     "cache": {
-      "redisUrl": "redisUrl"
+      "redisUrl": "redisUrl",
+      "TTL": 300
     },
     "logger": {
       "enabled": true,
