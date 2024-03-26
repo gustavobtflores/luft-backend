@@ -1,4 +1,5 @@
 import { Brapi } from '@src/clients/brapi';
+import CacheUtil from '@src/utils/cache';
 
 import brapiQuotesFixture from '@test/fixtures/brapi_quotes.json';
 import brapiQuotesNormalizedFixture from '@test/fixtures/brapi_quotes_normalized.json';
@@ -6,12 +7,14 @@ import brapiQuotesNormalizedFixture from '@test/fixtures/brapi_quotes_normalized
 import * as HTTPUtil from '@src/utils/request';
 
 jest.mock('@src/utils/request');
+jest.mock('@src/utils/cache');
 
 describe('Brapi client', () => {
   const MockedRequestClass = HTTPUtil.Request as jest.Mocked<
     typeof HTTPUtil.Request
   >;
   const mockedRequest = new HTTPUtil.Request() as jest.Mocked<HTTPUtil.Request>;
+  const mockedCache = CacheUtil as jest.Mocked<typeof CacheUtil>;
 
   it('should return the normalized assets quotation from the Brapi service', async () => {
     const tickers = ['ROXO34', 'INBR32'];
@@ -20,8 +23,10 @@ describe('Brapi client', () => {
       data: brapiQuotesFixture,
     } as HTTPUtil.Response);
 
-    const brapi = new Brapi(mockedRequest);
-    const response = await brapi.fetchStocks(tickers);
+    mockedCache.get.mockResolvedValue(null);
+
+    const brapi = new Brapi(mockedRequest, mockedCache);
+    const response = await brapi.fetchPrices({ stocks: tickers });
     expect(response).toEqual(brapiQuotesNormalizedFixture);
   });
 
@@ -40,8 +45,10 @@ describe('Brapi client', () => {
       data: incompleteResponse,
     } as HTTPUtil.Response);
 
+    mockedCache.get.mockResolvedValue(null);
+
     const brapi = new Brapi(mockedRequest);
-    const response = await brapi.fetchStocks(tickers);
+    const response = await brapi.fetchPrices({ stocks: tickers });
     expect(response).toEqual([]);
   });
 
@@ -49,9 +56,11 @@ describe('Brapi client', () => {
     const tickers = ['ROXO34', 'INBR32'];
     mockedRequest.get.mockRejectedValue({ message: 'Network Error' });
 
-    const brapi = new Brapi(mockedRequest);
+    mockedCache.get.mockResolvedValue(null);
 
-    await expect(brapi.fetchStocks(tickers)).rejects.toThrow(
+    const brapi = new Brapi(mockedRequest, mockedCache);
+
+    await expect(brapi.fetchPrices({ stocks: tickers })).rejects.toThrow(
       'Unexpected error when trying to communicate to Brapi: Network Error'
     );
   });
@@ -71,9 +80,11 @@ describe('Brapi client', () => {
       },
     });
 
-    const brapi = new Brapi(mockedRequest);
+    mockedCache.get.mockResolvedValue(null);
 
-    await expect(brapi.fetchStocks(tickers)).rejects.toThrow(
+    const brapi = new Brapi(mockedRequest, mockedCache);
+
+    await expect(brapi.fetchPrices({ stocks: tickers })).rejects.toThrow(
       'Unexpected error returned by Brapi service: Error: {"error":true,"message":"Você atingiu o limite de requisições para o seu plano. Por favor, considere fazer um upgrade para um plano melhor em brapi.dev/dashboard"} Code: 402'
     );
   });

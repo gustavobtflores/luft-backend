@@ -130,10 +130,10 @@ export class Investments {
       .filter((transaction) => transaction.tickerType === 'crypto')
       .map((transaction) => transaction.ticker);
 
-    const tickersData = await this.brapi.fetchStocks(tickers);
-    const coinsData = await this.brapi.fetchCrypto(coins);
-
-    const prices = [...tickersData, ...coinsData];
+    const prices = await this.brapi.fetchPrices({
+      stocks: tickers,
+      cryptos: coins,
+    });
 
     return prices;
   }

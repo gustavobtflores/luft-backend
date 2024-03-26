@@ -14,13 +14,10 @@ describe('Investments service', () => {
   const mockedBrapiService = new Brapi() as jest.Mocked<Brapi>;
 
   it('should return investments data for a list of transactions', async () => {
-    mockedBrapiService.fetchStocks.mockResolvedValue(
-      brapiQuotesNormalizedFixture
-    );
-
-    mockedBrapiService.fetchCrypto.mockResolvedValue(
-      brapiCryptoNormalizedFixture
-    );
+    mockedBrapiService.fetchPrices.mockResolvedValue([
+      ...brapiQuotesNormalizedFixture,
+      ...brapiCryptoNormalizedFixture,
+    ]);
 
     const transactions = investmentsTransactionsFixture as Transaction[];
 
@@ -67,7 +64,7 @@ describe('Investments service', () => {
     const transactions: Transaction[] =
       investmentsTransactionsFixture as Transaction[];
 
-    mockedBrapiService.fetchStocks.mockRejectedValue('Error fetching data');
+    mockedBrapiService.fetchPrices.mockRejectedValue('Error fetching data');
 
     const investments = new Investments(mockedBrapiService);
     await expect(

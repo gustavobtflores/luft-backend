@@ -8,10 +8,13 @@
       }
     },
     "database": {
-      "postgresUrl": "postgres://postgres:postgres@localhost:5555/luft"
+      "postgresUrl": "dbUrl"
     },
     "auth": {
       "key": "some-key"
+    },
+    "cache": {
+      "redisUrl": "redisUrl"
     },
     "logger": {
       "enabled": true,

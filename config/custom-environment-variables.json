@@ -10,6 +10,9 @@
     "database": {
       "postgresUrl": "POSTGRES_URL"
     },
+    "cache": {
+      "redisUrl": "REDIS_URL"
+    },
     "auth": {
       "key": "JWT_SECRET_KEY"
     }

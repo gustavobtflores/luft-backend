@@ -10,6 +10,7 @@ import { UsersController } from './controllers/users';
 import logger from './logger';
 import cors from 'cors';
 import httpPino from 'pino-http';
+import cache from './utils/cache';
 
 export class SetupServer extends Server {
   constructor(private port = 3000) {
@@ -20,6 +21,7 @@ export class SetupServer extends Server {
     this.setupExpress();
     this.setupControllers();
     await this.databaseSetup();
+    await this.cacheSetup();
   }
 
   private setupExpress(): void {
@@ -47,6 +49,10 @@ export class SetupServer extends Server {
     await database.connect();
   }
 
+  private async cacheSetup(): Promise<void> {
+    await cache.connect();
+  }
+
   public start(): void {
     this.app.listen(this.port, () => {
       logger.info(`Server listening on port ${this.port}`);
@@ -55,6 +61,7 @@ export class SetupServer extends Server {
 
   public async close(): Promise<void> {
     await database.close();
+    await cache.close();
   }
 
   public getApp(): Application {

@@ -2,6 +2,7 @@ import { InternalError } from '@src/utils/errors/internal-error';
 import config, { IConfig } from 'config';
 import * as HTTPUtil from '@src/utils/request';
 import { AxiosError, AxiosResponse } from 'axios';
+import CacheUtil from '@src/utils/cache';
 
 export interface BrapiQuote {
   readonly currency: string;
@@ -87,11 +88,67 @@ export class Brapi {
   private baseURL = brapiResourceConfig.get<string>('apiUrl');
   private requestTickersAmountLimit = 10;
 
-  constructor(protected http = new HTTPUtil.Request()) {}
+  constructor(
+    protected http = new HTTPUtil.Request(),
+    protected cacheUtil = CacheUtil
+  ) {}
 
-  public async fetchStocks(tickers: string[]): Promise<Price[]> {
-    if (tickers.length === 0) return [];
+  public async fetchPrices({
+    stocks,
+    cryptos,
+  }: {
+    stocks?: string[];
+    cryptos?: string[];
+  }): Promise<Price[]> {
+    let prices = await this.getPricesFromCache({ stocks, cryptos });
 
+    if (!prices.length) {
+      prices = await this.getPricesFromApi({ stocks, cryptos });
+      await this.setPricesInCache(prices);
+      return prices;
+    }
+
+    return prices;
+  }
+
+  private async getPricesFromApi(tickers: {
+    stocks?: string[];
+    cryptos?: string[];
+  }) {
+    const stocks = tickers.stocks ? await this.fetchStocks(tickers.stocks) : [];
+    const cryptos = tickers.cryptos
+      ? await this.fetchCryptos(tickers.cryptos)
+      : [];
+
+    return [...stocks, ...cryptos];
+  }
+
+  private async getPricesFromCache(tickers: {
+    stocks?: string[];
+    cryptos?: string[];
+  }) {
+    const stocks = tickers.stocks?.length ? tickers.stocks : [];
+    const cryptos = tickers.cryptos?.length ? tickers.cryptos : [];
+    const prices = [];
+
+    for (const entry of [...stocks, ...cryptos]) {
+      const cached = await this.cacheUtil.get(entry);
+
+      if (cached) {
+        prices.push(cached);
+      }
+    }
+
+    return prices;
+  }
+
+  private async setPricesInCache(prices: Price[]) {
+    for (const price of prices) {
+      await this.cacheUtil.set(price.ticker, price);
+    }
+  }
+
+  private async fetchStocks(tickers: string[]): Promise<Price[]> {
     try {
       const stockPromises = this.createPromisesBasedLimit<
         AxiosResponse<BrapiQuotesResponse>
@@ -123,9 +180,7 @@ export class Brapi {
     }
   }
 
-  public async fetchCrypto(cryptos: string[]) {
-    if (cryptos.length === 0) return [];
-
+  private async fetchCryptos(cryptos: string[]) {
     const cryptoPromises = this.createPromisesBasedLimit(cryptos, (coins) =>
       this.http.get<BrapiCryptoResponse>(`/v2/crypto?coin=${coins.join(',')}`, {
         baseURL: this.baseURL,

@@ -12,12 +12,12 @@
     "style:check": "prettier --check src/**/*.ts test/**/*.ts",
     "style:fix": "prettier --write src/**/*.ts test/**/*.ts",
     "test": "yarn test:functional && yarn test:unit",
-    "test:functional": "jest --projects ./test --runInBand --detectOpenHandles",
-    "test:unit": "jest",
+    "test:functional": "jest --setupFiles dotenv/config --projects ./test --runInBand --detectOpenHandles",
+    "test:unit": "jest --setupFiles dotenv/config",
     "db:migrate": "yarn build && node dist/src/database/migrate.js"
   },
-  "author": "gustavobtflores",
-  "license": "ISC",
+  "author": "Gustavo Flores",
+  "license": "MIT",
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
     "@types/body-parser": "^1.19.5",

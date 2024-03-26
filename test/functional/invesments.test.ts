@@ -1,3 +1,4 @@
+import CacheUtil from '@src/utils/cache';
 import brapiQuotesFixture from '@test/fixtures/brapi_quotes.json';
 import * as Transaction from '@src/models/transaction';
 import * as UserModel from '@src/models/user';
@@ -12,6 +13,7 @@ describe('Investments data functional tests', () => {
   };
   let token: string;
   beforeEach(async () => {
+    await CacheUtil.clear();
     await Transaction.remove();
     await UserModel.remove();
     const user = await UserModel.create(defaultUser);
