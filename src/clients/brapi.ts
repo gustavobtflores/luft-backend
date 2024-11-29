@@ -129,9 +129,10 @@ export class Brapi {
   }) {
     const stocks = tickers.stocks?.length ? tickers.stocks : [];
     const cryptos = tickers.cryptos?.length ? tickers.cryptos : [];
+    const allTickers = [...stocks, ...cryptos];
     const prices = [];
 
-    for (const entry of [...stocks, ...cryptos]) {
+    for (const entry of allTickers) {
       const cached = await this.cacheUtil.get(entry);
 
       if (cached) {

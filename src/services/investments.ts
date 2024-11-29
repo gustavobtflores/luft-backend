@@ -25,9 +25,9 @@ export class Investments {
 
   public async processInvestmentsForTransactions(
     transactions: Transaction[]
-  ): Promise<Price[]> {
+  ): Promise<Investment[]> {
     logger.info(
-      `Preparing a user investments for ${transactions.length} transactions`
+      `Preparing an user investments for ${transactions.length} transactions`
     );
 
     if (transactions.length === 0) {
@@ -78,35 +78,22 @@ export class Investments {
   ): Record<string, ConsolidatedTransaction> {
     const consolidated = transactions.reduce(
       (acc, curr: Transaction) => {
-        if (acc[curr.ticker]) {
-          if (curr.type === 'buy') {
-            acc[curr.ticker].quantity += curr.quantity;
-          } else {
-            acc[curr.ticker].quantity -= curr.quantity;
-          }
+        const quantity = curr.type === 'buy' ? curr.quantity : -curr.quantity;
 
-          acc[curr.ticker].total =
-            acc[curr.ticker].avgPrice * acc[curr.ticker].quantity;
+        if (acc[curr.ticker]) {
+          acc[curr.ticker].quantity += quantity;
+          acc[curr.ticker].total +=
+            curr.type === 'buy' ? curr.price * curr.quantity : 0;
           acc[curr.ticker].avgPrice =
             acc[curr.ticker].total / acc[curr.ticker].quantity;
         } else {
-          if (curr.type === 'buy') {
-            acc[curr.ticker] = {
-              quantity: curr.quantity,
-              ticker: curr.ticker,
-              tickerType: curr.tickerType,
-              avgPrice: curr.price,
-              total: curr.price * curr.quantity,
-            };
-          } else {
-            acc[curr.ticker] = {
-              quantity: -curr.quantity,
-              ticker: curr.ticker,
-              tickerType: curr.tickerType,
-              avgPrice: 0,
-              total: -curr.price * curr.quantity,
-            };
-          }
+          acc[curr.ticker] = {
+            quantity: quantity,
+            ticker: curr.ticker,
+            tickerType: curr.tickerType,
+            avgPrice: curr.price,
+            total: curr.price * quantity,
+          };
         }
 
         return acc;

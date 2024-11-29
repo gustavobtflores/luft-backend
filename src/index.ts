@@ -34,7 +34,7 @@ process.on('uncaughtException', (error) => {
       process.on(signal, async () => {
         try {
           await server.close();
-          logger.info('App exited with sucess');
+          logger.info('App exited with success');
           process.exit(ExitStatus.Success);
         } catch (err) {
           logger.error(`App exited with error: ${err}`);

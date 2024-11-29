@@ -36,6 +36,10 @@ export const findOne = async ({
   return user[0];
 };
 
+export const findAll = () => {
+  return db.select({ id: users.id }).from(users);
+};
+
 type NewUser = typeof users.$inferInsert;
 
 export interface User extends NewUser {}

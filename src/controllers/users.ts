@@ -67,7 +67,15 @@ export class UsersController extends BaseController {
       id: user.id,
     });
 
-    res.status(200).send({ token });
+    const sevenDaysInMilliseconds = 1000 * 60 * 60 * 24 * 7;
+
+    res
+      .status(200)
+      .cookie('accessToken', token, {
+        maxAge: sevenDaysInMilliseconds,
+        httpOnly: true,
+      })
+      .send({ accessToken: token });
   }
 
   @Get('me')

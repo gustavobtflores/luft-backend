@@ -1,4 +1,5 @@
 import './utils/module-alias';
+import CronScheduler from '@src/utils/cron';
 
 import { Server } from '@overnightjs/core';
 import { Application } from 'express';
@@ -11,6 +12,8 @@ import logger from './logger';
 import cors from 'cors';
 import httpPino from 'pino-http';
 import cache from './utils/cache';
+import cookieParser from 'cookie-parser';
+import { BalancesController } from './controllers/balances';
 
 export class SetupServer extends Server {
   constructor(private port = 3000) {
@@ -22,14 +25,17 @@ export class SetupServer extends Server {
     this.setupControllers();
     await this.databaseSetup();
     await this.cacheSetup();
+    this.schedulerSetup();
   }
 
   private setupExpress(): void {
     this.app.use(bodyParser.json());
+    this.app.use(cookieParser());
     this.app.use(httpPino({ logger }));
     this.app.use(
       cors({
-        origin: '*',
+        credentials: true,
+        origin: 'http://localhost:5173',
       })
     );
   }
@@ -38,10 +44,12 @@ export class SetupServer extends Server {
     const investmentsController = new InvestmentsController();
     const transactionsController = new TransactionsController();
     const usersController = new UsersController();
+    const balancesController = new BalancesController();
     this.addControllers([
       investmentsController,
       transactionsController,
       usersController,
+      balancesController,
     ]);
   }
 
@@ -53,6 +61,10 @@ export class SetupServer extends Server {
     await cache.connect();
   }
 
+  private schedulerSetup() {
+    CronScheduler.start();
+  }
+
   public start(): void {
     this.app.listen(this.port, () => {
       logger.info(`Server listening on port ${this.port}`);
@@ -60,6 +72,7 @@ export class SetupServer extends Server {
   }
 
   public async close(): Promise<void> {
+    CronScheduler.close();
     await database.close();
     await cache.close();
   }

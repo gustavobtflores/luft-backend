@@ -48,3 +48,13 @@ export const users = pgTable('users', {
   email: varchar('email', { length: 255 }).unique().notNull(),
   password: text('password').notNull(),
 });
+
+export const balances = pgTable('balances', {
+  id: serial('id').primaryKey(),
+  createdAt: timestamp('created_at').defaultNow(),
+  userId: uuid('user_id')
+    .references(() => users.id, { onDelete: 'cascade' })
+    .notNull(),
+  total: decimalNumber('total').notNull(),
+  appreciation: decimalNumber('appreciation').notNull(),
+});

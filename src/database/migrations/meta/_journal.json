@@ -43,6 +43,13 @@
       "when": 1710565937956,
       "tag": "0005_fresh_zombie",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1711555096443,
+      "tag": "0006_easy_human_robot",
+      "breakpoints": true
     }
   ]
 }
