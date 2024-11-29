@@ -4,7 +4,8 @@
     "resources": {
       "Brapi": {
         "apiUrl": "BRAPI_API_URL",
-        "apiToken": "BRAPI_API_TOKEN"
+        "apiToken": "BRAPI_API_TOKEN",
+        "apiSimultaneousRequestLimit": "BRAPI_SIMULTANEOUS_REQUEST_LIMIT"
       }
     },
     "database": {

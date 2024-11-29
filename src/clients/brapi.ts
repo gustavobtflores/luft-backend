@@ -86,7 +86,9 @@ const brapiResourceConfig: IConfig = config.get('App.resources.Brapi');
 
 export class Brapi {
   private baseURL = brapiResourceConfig.get<string>('apiUrl');
-  private requestTickersAmountLimit = 10;
+  private requestTickersAmountLimit = brapiResourceConfig.get<number>(
+    'apiSimultaneousRequestLimit'
+  );
 
   constructor(
     protected http = new HTTPUtil.Request(),
