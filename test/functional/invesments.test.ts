@@ -38,7 +38,7 @@ describe('Investments data functional tests', () => {
       .reply(200, brapiQuotesFixture, ['Content-Type', 'application/json']);
     const { body, status } = await global.testRequest
       .get('/investments')
-      .set({ 'x-access-token': token });
+      .set('Cookie', ['accessToken=' + token]);
 
     expect(status).toBe(200);
     expect(body).toEqual([
@@ -63,7 +63,7 @@ describe('Investments data functional tests', () => {
 
     const { status } = await global.testRequest
       .get('/investments')
-      .set({ 'x-access-token': token });
+      .set('Cookie', ['accessToken=' + token]);
 
     expect(status).toBe(500);
   });

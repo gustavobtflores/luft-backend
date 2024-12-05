@@ -5,8 +5,8 @@ describe('AuthMiddleware', () => {
   it('should verify a JWT token and call the next middleware', () => {
     const jwtToken = AuthService.generateToken({ data: 'fake' });
     const reqFake = {
-      headers: {
-        'x-access-token': jwtToken,
+      cookies: {
+        accessToken: jwtToken,
       },
     };
 
@@ -20,8 +20,8 @@ describe('AuthMiddleware', () => {
 
   it('should return UNAUTHORIZED if there is a problem on the token validation', () => {
     const reqFake = {
-      headers: {
-        'x-access-token': 'invalid-token',
+      cookies: {
+        accessToken: 'invalid-token',
       },
     };
 
@@ -44,8 +44,8 @@ describe('AuthMiddleware', () => {
 
   it('should return UNAUTHORIZED if there is no token', () => {
     const reqFake = {
-      headers: {
-        'x-access-token': 'invalid-token',
+      cookies: {
+        accessToken: 'invalid-token',
       },
     };
 

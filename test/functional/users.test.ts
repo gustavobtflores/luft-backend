@@ -55,7 +55,7 @@ describe('Users functional tests', () => {
         .send({ email: newUser.email, password: newUser.password });
 
       expect(response.body).toEqual(
-        expect.objectContaining({ token: expect.any(String) })
+        expect.objectContaining({ accessToken: expect.any(String) })
       );
     });
   });
@@ -74,7 +74,7 @@ describe('Users functional tests', () => {
 
       const response = await global.testRequest
         .get('/users/me')
-        .set({ 'x-access-token': token });
+        .set('Cookie', ['accessToken=' + token]);
 
       expect(response.status).toBe(200);
       expect(response.body).toMatchObject({
@@ -93,7 +93,7 @@ describe('Users functional tests', () => {
 
       const { body, status } = await global.testRequest
         .get('/users/me')
-        .set({ 'x-access-token': token });
+        .set('Cookie', ['accessToken=' + token]);
 
       expect(status).toBe(404);
       expect(body.message).toBe('User not found');

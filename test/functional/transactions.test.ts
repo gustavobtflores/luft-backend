@@ -37,7 +37,7 @@ describe('Transactions functional tests', () => {
 
       const response = await global.testRequest
         .post('/transactions')
-        .set({ 'x-access-token': token })
+        .set('Cookie', ['accessToken=' + token])
         .send(newTransaction);
 
       expect(response.status).toBe(201);
@@ -56,8 +56,9 @@ describe('Transactions functional tests', () => {
 
       const { status, body } = await global.testRequest
         .post('/transactions')
-        .set({ 'x-access-token': token })
+        .set('Cookie', ['accessToken=' + token])
         .send(newTransaction);
+
       expect(status).toBe(422);
       expect(body).toEqual({
         code: 422,
