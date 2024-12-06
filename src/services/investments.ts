@@ -5,6 +5,8 @@ import { InternalError } from '@src/utils/errors/internal-error';
 
 interface ConsolidatedTransaction
   extends Omit<Transaction, 'price' | 'type' | 'userId'> {
+  totalPurchased: number;
+  totalCost: number;
   avgPrice: number;
   total: number;
 }
@@ -66,9 +68,11 @@ export class Investments {
       ...price,
       ...transaction,
       appreciation:
-        transaction.quantity * price.currentPrice - transaction.total,
+        transaction.quantity * price.currentPrice -
+        transaction.avgPrice * transaction.quantity,
       appreciationPercent:
         (price.currentPrice - transaction.avgPrice) / transaction.avgPrice,
+      total: price.currentPrice * transaction.quantity,
     };
   }
 
@@ -78,22 +82,26 @@ export class Investments {
   ): Record<string, ConsolidatedTransaction> {
     const consolidated = transactions.reduce(
       (acc, curr: Transaction) => {
-        const quantity = curr.type === 'buy' ? curr.quantity : -curr.quantity;
+        const { price, quantity, ticker, tickerType, type } = curr;
 
-        if (acc[curr.ticker]) {
-          acc[curr.ticker].quantity += quantity;
-          acc[curr.ticker].total +=
-            curr.type === 'buy' ? curr.price * curr.quantity : 0;
-          acc[curr.ticker].avgPrice =
-            acc[curr.ticker].total / acc[curr.ticker].quantity;
+        acc[ticker] = acc[ticker] || {
+          ticker,
+          tickerType,
+          avgPrice: price,
+          total: 0,
+          totalPurchased: 0,
+          totalCost: 0,
+          quantity: 0,
+        };
+
+        if (type === 'buy') {
+          acc[ticker].quantity += quantity;
+          acc[ticker].totalCost += price * quantity;
+          acc[ticker].totalPurchased += quantity;
+          acc[ticker].avgPrice =
+            acc[ticker].totalCost / acc[ticker].totalPurchased;
         } else {
-          acc[curr.ticker] = {
-            quantity: quantity,
-            ticker: curr.ticker,
-            tickerType: curr.tickerType,
-            avgPrice: curr.price,
-            total: curr.price * quantity,
-          };
+          acc[ticker].quantity -= quantity;
         }
 
         return acc;

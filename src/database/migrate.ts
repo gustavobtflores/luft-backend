@@ -3,7 +3,7 @@ import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import { db, connection } from './db';
 import logger from '../logger';
 
-export async function main() {
+export async function runMigration() {
   await connection.connect();
 
   logger.info('Running database migrations');
@@ -17,7 +17,7 @@ export async function main() {
   process.exit(0);
 }
 
-main().catch((err) => {
+runMigration().catch((err) => {
   logger.error(`Migration failed with error: ${err}`);
   process.exit(1);
 });

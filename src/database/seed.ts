@@ -10,7 +10,7 @@ async function main() {
   await db.delete(users);
   await db.delete(transactions);
 
-  const password = await AuthService.hashPassword('rapaz');
+  const password = await AuthService.hashPassword('test');
 
   await db.insert(users).values([
     {

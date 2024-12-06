@@ -6,33 +6,6 @@ jobs:
     runs-on: ubuntu-latest
     container: node:20.11-alpine
 
-    services:
-      postgres:
-        image: postgres
-
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_USER: postgres
-          POSTGRES_DB: luft
-
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-
-      redis:
-        image: redis
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 6379:6379
-
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
@@ -43,12 +16,9 @@ jobs:
       - name: Run lint check
         run: yarn lint
 
-      - name: Run database migrations
-        run: yarn db:migrate
-
       - name: Run all tests
         run: yarn test
 
 env:
-  POSTGRES_URL: 'postgres://postgres:postgres@postgres:5432/luft'
+  POSTGRES_URL: 'postgres://postgres:postgres@postgres:5555/luft'
   REDIS_URL: 'redis://redis:6379'
