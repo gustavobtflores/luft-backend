@@ -1,4 +1,6 @@
-import { Brapi, Price } from '@src/clients/brapi';
+import { Price } from '@src/clients/types/BrapiTypes';
+import { Brapi } from '@src/clients/brapi';
+
 import logger from '@src/logger';
 import { Transaction } from '@src/models/transaction';
 import { InternalError } from '@src/utils/errors/internal-error';

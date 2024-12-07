@@ -1,5 +1,5 @@
 import { RedisClientConnection, redisClient } from '@src/cache/redis';
-import { Price } from '@src/clients/brapi';
+import { Price } from '@src/clients/types/BrapiTypes';
 import config from 'config';
 
 class CacheUtil {
