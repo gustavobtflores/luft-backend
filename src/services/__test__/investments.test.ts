@@ -31,7 +31,9 @@ describe('Investments service', () => {
         quantity: 5,
         ticker: 'ROXO34',
         tickerType: 'bdr',
-        total: 36.25,
+        total: 41.25,
+        totalCost: 72.5,
+        totalPurchased: 10,
       },
       {
         appreciation: 211567.705625,
@@ -42,7 +44,9 @@ describe('Investments service', () => {
         quantity: 1,
         ticker: 'BTC',
         tickerType: 'crypto',
-        total: 120000,
+        total: 331567.705625,
+        totalCost: 120000,
+        totalPurchased: 1,
       },
     ];
 

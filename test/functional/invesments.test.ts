@@ -51,7 +51,9 @@ describe('Investments data functional tests', () => {
         avgPrice: 7.25,
         logoUrl: 'https://s3-symbol-logo.tradingview.com/nu-holdings--big.svg',
         tickerType: 'bdr',
-        total: 58,
+        total: 66,
+        totalCost: 58,
+        totalPurchased: 8,
       },
     ]);
   });

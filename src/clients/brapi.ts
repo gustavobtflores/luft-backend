@@ -3,70 +3,13 @@ import config, { IConfig } from 'config';
 import * as HTTPUtil from '@src/utils/request';
 import { AxiosError, AxiosResponse } from 'axios';
 import CacheUtil from '@src/utils/cache';
-
-export interface BrapiQuote {
-  readonly currency: string;
-  readonly twoHundredDayAverage: number;
-  readonly twoHundredDayAverageChange: number;
-  readonly twoHundredDayAverageChangePercent: number;
-  readonly marketCap: number;
-  readonly shortName: string;
-  readonly longName: string;
-  readonly regularMarketChange: number;
-  readonly regularMarketChangePercent: number;
-  readonly regularMarketTime: string;
-  readonly regularMarketPrice: number;
-  readonly regularMarketDayHigh: number;
-  readonly regularMarketDayRange: string;
-  readonly regularMarketDayLow: number;
-  readonly regularMarketVolume: number;
-  readonly regularMarketPreviousClose: number;
-  readonly regularMarketOpen: number;
-  readonly averageDailyVolume3Month: number;
-  readonly averageDailyVolume10Day: number;
-  readonly fiftyTwoWeekLowChange: number;
-  readonly fiftyTwoWeekLowChangePercent: number;
-  readonly fiftyTwoWeekRange: string;
-  readonly fiftyTwoWeekHighChange: number;
-  readonly fiftyTwoWeekHighChangePercent: number;
-  readonly fiftyTwoWeekLow: number;
-  readonly fiftyTwoWeekHigh: number;
-  readonly symbol: string;
-  readonly priceEarnings: number;
-  readonly earningsPerShare: number;
-  readonly logourl: string;
-}
-
-export interface BrapiQuotesResponse {
-  results: BrapiQuote[];
-}
-
-export interface BrapiCrypto {
-  currency: string;
-  currencyRateFromUSD: number;
-  coinName: string;
-  coin: string;
-  regularMarketChange: number;
-  regularMarketPrice: number;
-  regularMarketChangePercent: number;
-  regularMarketDayLow: number;
-  regularMarketDayHigh: number;
-  regularMarketDayRange: string;
-  regularMarketVolume: number;
-  marketCap: number;
-  regularMarketTime: string;
-  coinImageUrl: string;
-}
-
-export interface BrapiCryptoResponse {
-  coins: BrapiCrypto[];
-}
-
-export interface Price {
-  currentPrice: number;
-  ticker: string;
-  logoUrl: string;
-}
+import {
+  Price,
+  BrapiQuotesResponse,
+  BrapiCryptoResponse,
+  BrapiQuote,
+  BrapiCrypto,
+} from './types/BrapiTypes';
 
 export class ClientRequestError extends InternalError {
   constructor(message: string) {
@@ -86,15 +29,17 @@ const brapiResourceConfig: IConfig = config.get('App.resources.Brapi');
 
 export class Brapi {
   private baseURL = brapiResourceConfig.get<string>('apiUrl');
-  private requestTickersAmountLimit = brapiResourceConfig.get<number>(
-    'apiSimultaneousRequestLimit'
-  );
 
   constructor(
     protected http = new HTTPUtil.Request(),
-    protected cacheUtil = CacheUtil
+    protected cacheUtil = CacheUtil,
+    private requestLimit = brapiResourceConfig.get<number>(
+      'apiSimultaneousRequestLimit'
+    )
   ) {}
 
+  /** Try to get prices from cache,
+   * if doesn't exist entries on cache, fetch from Brapi API */
   public async fetchPrices({
     stocks,
     cryptos,
@@ -151,6 +96,9 @@ export class Brapi {
     }
   }
 
+  /** Creates a list of Promises to fetch Brapi API based on the request limit
+   * and the list of stocks
+   */
   private async fetchStocks(tickers: string[]): Promise<Price[]> {
     try {
       const stockPromises = this.createPromisesBasedLimit<
@@ -183,24 +131,43 @@ export class Brapi {
     }
   }
 
+  /** Creates a list of Promises to fetch Brapi API based on the request limit
+   * and the list of cryptos
+   */
   private async fetchCryptos(cryptos: string[]) {
-    const cryptoPromises = this.createPromisesBasedLimit(cryptos, (coins) =>
-      this.http.get<BrapiCryptoResponse>(`/v2/crypto?coin=${coins.join(',')}`, {
-        baseURL: this.baseURL,
-        headers: {
-          Authorization: `Bearer ${brapiResourceConfig.get('apiToken')}`,
-        },
-      })
-    );
+    try {
+      const cryptoPromises = this.createPromisesBasedLimit(cryptos, (coins) =>
+        this.http.get<BrapiCryptoResponse>(
+          `/v2/crypto?coin=${coins.join(',')}`,
+          {
+            baseURL: this.baseURL,
+            headers: {
+              Authorization: `Bearer ${brapiResourceConfig.get('apiToken')}`,
+            },
+          }
+        )
+      );
 
-    const response =
-      await Promise.all<AxiosResponse<BrapiCryptoResponse>>(cryptoPromises);
+      const response =
+        await Promise.all<AxiosResponse<BrapiCryptoResponse>>(cryptoPromises);
 
-    return this.normalizeCryptosResponse(
-      response.map(({ data }) => data.coins).flat()
-    );
+      return this.normalizeCryptosResponse(
+        response.map(({ data }) => data.coins).flat()
+      );
+    } catch (err) {
+      const axiosError = err as AxiosError;
+
+      if (HTTPUtil.Request.isRequestError(axiosError)) {
+        throw new BrapiRequestError(
+          `Error: ${JSON.stringify(axiosError?.response?.data)} Code: ${axiosError?.response?.status}`
+        );
+      }
+
+      throw new ClientRequestError((err as Error).message);
+    }
   }
 
+  //** Removes invalid or incomplete stocks and returns the data normalized */
   private normalizeStocksResponse(quotes: BrapiQuote[]): Price[] {
     return quotes.filter(this.isValidQuote.bind(this)).map((quote) => ({
       logoUrl: quote.logourl,
@@ -209,6 +176,7 @@ export class Brapi {
     }));
   }
 
+  //** Removes invalid or incomplete cryptos and returns the data normalized */
   private normalizeCryptosResponse(coins: BrapiCrypto[]): Price[] {
     return coins.filter(this.isValidCrypto.bind(this)).map((coin) => ({
       logoUrl: coin.coinImageUrl,
@@ -233,9 +201,7 @@ export class Brapi {
     const promises = [];
 
     while (tickersCopy.length) {
-      promises.push(
-        callback(tickersCopy.splice(0, this.requestTickersAmountLimit))
-      );
+      promises.push(callback(tickersCopy.splice(0, this.requestLimit)));
     }
 
     return promises;
