@@ -4,11 +4,15 @@ on: push
 jobs:
   lint-and-test:
     runs-on: ubuntu-latest
-    container: node:20.11-alpine
 
     steps:
-      - name: Check out repository code
+      - name: Checkout repo
         uses: actions/checkout@v4
+
+      - name: Use Node.js v20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
       - name: Install dependencies
         run: yarn --frozen-lockfile
