@@ -6,6 +6,7 @@ import {
   StartedDockerComposeEnvironment,
   Wait,
 } from 'testcontainers';
+import { pushMigration } from '@src/database/push';
 
 const composeFilePath = path.resolve(__dirname, '..');
 const composeFile = 'docker-compose.yml';
@@ -28,6 +29,8 @@ beforeAll(async () => {
   server = new SetupServer();
   await server.init();
   global.testRequest = supertest(server.getApp());
+
+  await pushMigration();
 });
 
 afterAll(async () => {
