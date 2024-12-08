@@ -25,7 +25,7 @@ describe('Brapi client', () => {
 
     mockedCache.get.mockResolvedValue(null);
 
-    const brapi = new Brapi(mockedRequest, mockedCache);
+    const brapi = new Brapi(mockedRequest, mockedCache, 10);
     const response = await brapi.fetchPrices({ stocks: tickers });
     expect(response).toEqual(brapiQuotesNormalizedFixture);
   });
